@@ -7,9 +7,15 @@
   "theme_color": "#FFD500",
   "icons": [
     {
-      "src": "icono-goal-zero.svg",
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
+

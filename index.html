@@ -703,9 +703,38 @@
         let currentRol = null;
         let chartPieInst = null;
         let chartBarInst = null;
+        let deferredPrompt = null;
 
         Chart.defaults.color = "#9aa1aa";
         Chart.defaults.font.family = "Inter";
+
+        // ==========================================
+        // CAPTURA DE INSTALACIÓN PWA (BANNER AUTOMÁTICO)
+        // ==========================================
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Muestra automáticamente el popup amigable para instalar la aplicación
+            const botonesHtml = `
+                <button class="btn-action btn-gray btn-small" onclick="closeCustomPopup()">Más tarde</button>
+                <button class="btn-action btn-yellow btn-small" onclick="instalarPWAApp()">Instalar</button>
+            `;
+            mostrarPopup("📱 Instalar Aplicación", "¿Deseas instalar GOAL ZERO en tu dispositivo para un acceso rápido?", false, botonesHtml);
+        });
+
+        function instalarPWAApp() {
+            closeCustomPopup();
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('El usuario aceptó la instalación de la PWA');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
 
         // ==========================================
         // LÓGICA DE HITOS Y FESTEJOS
@@ -882,7 +911,7 @@
         function mostrarPopup(titulo, mensaje, esError = false, botonesHtml = null, customHtml = null) {
             const popup = document.getElementById('customPopup');
             document.getElementById('popupTitle').innerText = titulo;
-            document.getElementById('popupTitle'].style.color = esError ? 'var(--shell-red)' : 'var(--shell-yellow)';
+            document.getElementById('popupTitle').style.color = esError ? 'var(--shell-red)' : 'var(--shell-yellow)';
             
             popup.classList.toggle('error', esError);
             
