@@ -6,6 +6,10 @@
     
     <title>GOAL ZERO | Safety Performance System</title>
 
+    <!-- Configuración PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FFD500">
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -794,6 +798,13 @@
             sincronizarConServidor();
             setInterval(actualizarRelojesYAnimacion, 1000);
             setInterval(sincronizarConServidor, 120000); 
+
+            // Registro de Service Worker para PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(() => console.log("Service Worker registrado con éxito"))
+                    .catch((err) => console.log("Fallo al registrar Service Worker", err));
+            }
         };
 
         function setSyncStatus(status) {
@@ -871,7 +882,7 @@
         function mostrarPopup(titulo, mensaje, esError = false, botonesHtml = null, customHtml = null) {
             const popup = document.getElementById('customPopup');
             document.getElementById('popupTitle').innerText = titulo;
-            document.getElementById('popupTitle').style.color = esError ? 'var(--shell-red)' : 'var(--shell-yellow)';
+            document.getElementById('popupTitle'].style.color = esError ? 'var(--shell-red)' : 'var(--shell-yellow)';
             
             popup.classList.toggle('error', esError);
             
