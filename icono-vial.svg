@@ -1,0 +1,86 @@
+<svg
+  width="128"
+  height="128"
+  viewBox="0 0 128 128"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="Persona con cinturón de seguridad">
+
+  <!-- Fondo circular -->
+  <circle
+    cx="64"
+    cy="64"
+    r="58"
+    fill="#202428"
+    stroke="#FFFFFF"
+    stroke-width="5"/>
+
+  <!-- Cabeza -->
+  <circle
+    cx="64"
+    cy="36"
+    r="12"
+    fill="#FFFFFF"/>
+
+  <!-- Cuerpo -->
+  <path
+    d="M42 88
+       C43 69 50 57 64 57
+       C78 57 85 69 86 88
+       Z"
+    fill="#FFFFFF"/>
+
+  <!-- Hombro izquierdo -->
+  <path
+    d="M48 63
+       C41 66 37 74 36 88
+       H46
+       C47 77 50 69 55 65
+       Z"
+    fill="#FFFFFF"/>
+
+  <!-- Hombro derecho -->
+  <path
+    d="M80 63
+       C87 66 91 74 92 88
+       H82
+       C81 77 78 69 73 65
+       Z"
+    fill="#FFFFFF"/>
+
+  <!-- Cinturón de seguridad -->
+  <path
+    d="M47 59
+       L79 89"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="7"
+    stroke-linecap="round"/>
+
+  <!-- Separación del cinturón -->
+  <path
+    d="M47 59
+       L79 89"
+    fill="none"
+    stroke="#202428"
+    stroke-width="2"
+    stroke-linecap="round"/>
+
+  <!-- Hebilla -->
+  <rect
+    x="75"
+    y="84"
+    width="11"
+    height="8"
+    rx="2"
+    fill="#FFFFFF"/>
+
+  <rect
+    x="78"
+    y="86"
+    width="5"
+    height="4"
+    rx="1"
+    fill="#202428"/>
+
+</svg>

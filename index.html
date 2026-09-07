@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <title>GOAL ZERO | Safety Performance System</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================================================
+           GOAL ZERO | LOGIC TEAM SAFETY PERFORMANCE SYSTEM
+           ========================================================= */
+
+        :root {
+            --shell-yellow: #FFD500;
+            --shell-red: #DD1D21;
+            
+            --bg: #080a0d;
+            --bg-soft: #0d1014;
+            --surface: #11151a;
+            --surface-2: #161b21;
+            
+            --border: rgba(255,255,255,0.08);
+            --border-strong: rgba(255,255,255,0.14);
+            
+            --text: #f5f6f7;
+            --text-soft: #a9afb7;
+            --text-muted: #707780;
+            
+            --green: #49d17d;
+            --warning: #f1c40f;
+            --danger: #ff4d52;
+            
+            --header-height: 65px;
+            --shadow: 0 20px 60px rgba(0,0,0,.45);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Bloqueo estricto anti-scroll para la pantalla principal */
+        html, body {
+            width: 100%;
+            height: calc(var(--vh, 1vh) * 100);
+            height: 100dvh;
+            position: fixed;
+            inset: 0;
+            overflow: hidden !important;
+            overscroll-behavior: none;
+            background: radial-gradient(circle at 50% -20%, rgba(255,213,0,.07), transparent 35%), linear-gradient(180deg, #080a0d 0%, #06080a 100%);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            touch-action: none;
+        }
+
+        button, input, select, textarea {
+            font-family: inherit;
+        }
+
+        /* =========================================================
+           HEADER
+           ========================================================= */
+        .corporate-header {
+            height: var(--header-height);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: rgba(8,10,13,.96);
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            z-index: 20;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .goal-zero-logo {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .zero-mark {
+            color: var(--shell-yellow);
+            position: relative;
+        }
+
+        .zero-mark::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--shell-yellow);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            opacity: .25;
+        }
+
+        .logic-team-tag {
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--shell-yellow);
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid var(--border-strong);
+            white-space: nowrap;
+        }
+
+        .brand-subtitle {
+            color: var(--text-muted);
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 1px solid var(--border-strong);
+            white-space: nowrap;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        .sync-dot.loading { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
+        .sync-dot.success { background: var(--green); box-shadow: 0 0 6px var(--green); }
+        .sync-dot.error { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+
+        .admin-trigger {
+            border: 1px solid var(--border-strong);
+            background: rgba(255,255,255,.03);
+            color: var(--text-soft);
+            height: 30px;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: .2s;
+        }
+        .admin-trigger:hover {
+            border-color: rgba(255,213,0,.5);
+            color: var(--shell-yellow);
+            background: rgba(255,213,0,.05);
+        }
+
+        /* =========================================================
+           MAIN PERFORMANCE DASHBOARD
+           ========================================================= */
+        .performance-grid {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            height: calc(var(--vh, 1vh) * 100 - var(--header-height));
+            height: calc(100dvh - var(--header-height));
+            overflow: hidden;
+        }
+
+        .instrument-box {
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 0;
+            min-width: 0;
+            padding: 10px;
+            border-right: 1px solid var(--border);
+        }
+        .instrument-box:last-child { border-right: none; }
+
+        .inst-category {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(9px, 1vw, 12px);
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .inst-category::before {
+            content: "";
+            display: inline-block;
+            width: 10px;
+            height: 2px;
+            background: var(--shell-yellow);
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        /* METRIC CIRCLE ANTICORTE / ANTI-ÓVALO */
+        .metric-display {
+            --size: clamp(95px, min(22vw, 26vh), 260px);
+            width: var(--size);
+            height: var(--size);
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .metric-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.12);
+            background: radial-gradient(circle, rgba(255,255,255,.025) 0%, transparent 65%);
+            box-shadow: inset 0 0 20px rgba(0,0,0,.4);
+        }
+
+        /* ICONO VECTORIAL EXTERNO UBICADO DEBAJO DEL NÚMERO */
+        .metric-watermark {
+            position: absolute;
+            width: 26%;
+            height: 26%;
+            bottom: 14%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.35;
+            z-index: 3;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .instrument-box:hover .metric-watermark {
+            opacity: 0.6;
+        }
+
+        /* LÍNEA CURVADA DINÁMICA (Progreso del mes/tiempo) */
+        .metric-ring::before {
+            content: "";
+            position: absolute;
+            inset: 1px;
+            border-radius: 50%;
+            border: 5px solid rgba(255,213,0,.15);
+            border-top-color: var(--shell-yellow);
+            border-left-color: var(--shell-yellow);
+            transform: rotate(var(--month-progress, 0deg));
+            transition: transform 1s ease-in-out;
+        }
+
+        /* PUNTO AMARILLO ANIMADO */
+        .metric-ring::after {
+            content: "";
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--shell-yellow);
+            top: 2px;
+            left: 50%;
+            transform-origin: 50% calc(var(--size) / 2 - 2px);
+            transform: translateX(-50%) rotate(var(--second-rotation, 0deg));
+            box-shadow: 0 0 8px rgba(255,213,0,1);
+            transition: transform 0.2s linear;
+        }
+
+        .metric-number {
+            position: relative;
+            z-index: 5;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(2.8rem, 6vw, 6rem);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -2px;
+            color: white;
+            text-shadow: 0 0 15px rgba(0,0,0,.9);
+            margin-bottom: 12%;
+        }
+
+        .metric-label {
+            position: relative;
+            z-index: 2;
+            margin-top: 6px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(11px, 1.4vw, 18px);
+            font-weight: 600;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .time-counter {
+            position: relative;
+            z-index: 2;
+            margin-top: 3px;
+            color: var(--text-muted);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: clamp(9px, 0.9vw, 12px);
+            letter-spacing: .8px;
+        }
+        .time-counter span {
+            color: var(--shell-yellow);
+            font-weight: 600;
+        }
+
+        /* =========================================================
+           RESPONSIVE MOBILE (DISTRIBUCIÓN EXACTA SIN CORTES)
+           ========================================================= */
+        @media (max-width: 768px) and (orientation: portrait) {
+            :root { --header-height: 44px; }
+            .corporate-header { padding: 0 10px; }
+            .goal-zero-logo { font-size: 16px; }
+            
+            .brand-subtitle { display: none; }
+            .logic-team-tag { font-size: 11px; margin-left: 8px; padding-left: 8px; }
+            
+            .system-status span#syncText { display: none; }
+            .admin-trigger { height: 26px; padding: 0 8px; font-size: 8px; }
+
+            .performance-grid {
+                flex-direction: column;
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+            .instrument-box {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 4px 8px;
+                gap: 2px;
+                justify-content: center;
+            }
+            .instrument-box:last-child { border-bottom: none; }
+
+            .metric-display {
+                --size: clamp(110px, 32vh, 220px);
+                margin: 4px 0;
+            }
+            .metric-number { font-size: clamp(2.8rem, 11vh, 5rem); }
+            .metric-label { font-size: clamp(16px, 3.4vw, 16px); margin-top: 4px; }
+            .time-counter { font-size: clamp(15px, 2.6vw, 12px); margin-top: 3px; }
+            .inst-category { margin-bottom: 2px; font-size: 16px; }
+        }
+
+        @media (max-height: 500px) and (orientation: landscape) {
+            :root { --header-height: 38px; }
+            .corporate-header { padding: 0 8px; }
+            .brand-subtitle { display: none; }
+            .logic-team-tag { font-size: 10px; margin-left: 6px; padding-left: 6px; }
+            .goal-zero-logo { font-size: 14px; }
+            
+            .instrument-box { justify-content: space-evenly; padding: 2px; }
+            .metric-display { --size: clamp(70px, min(45vh, 20vw), 110px); }
+            .metric-number { font-size: clamp(1.6rem, 9vh, 2.5rem); margin-bottom: 8%; }
+            .metric-label { font-size: clamp(9px, 3vh, 11px); margin-top: 1px; }
+            .time-counter { font-size: 7px; }
+            .inst-category { margin-bottom: 1px; font-size: 7px; }
+        }
+
+        /* =========================================================
+           MODAL Y ADMINISTRACIÓN
+           ========================================================= */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            touch-action: auto;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal-content {
+            width: min(1000px, 96vw);
+            height: min(780px, 94vh);
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            border-radius: 14px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: linear-gradient(90deg, rgba(255,213,0,.05), transparent 40%);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .modal-title { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+        .modal-title span { color: var(--shell-yellow); }
+        .close-modal { background: transparent; border: none; color: var(--text-soft); font-size: 22px; cursor: pointer; }
+        .close-modal:hover { color: var(--shell-red); }
+
+        .modal-body {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; margin-bottom: 5px; font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .form-control {
+            width: 100%; min-height: 38px; background: #0b0e12; border: 1px solid var(--border-strong);
+            border-radius: 6px; color: white; padding: 8px 10px; font-size: 12px; outline: none;
+        }
+        .form-control:focus { border-color: rgba(255,213,0,.5); }
+        
+        .password-wrapper { position: relative; }
+        .password-toggle { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-muted); font-size: 10px; cursor: pointer; }
+        
+        .btn-action { width: 100%; min-height: 38px; border: none; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+        .btn-yellow { background: var(--shell-yellow); color: #000; }
+        .btn-red { background: rgba(221,29,33,.15); color: #ff6c70; border: 1px solid rgba(221,29,33,.4); }
+        .btn-gray { background: rgba(255,255,255,.05); color: var(--text-soft); border: 1px solid var(--border); }
+        .btn-small { min-height: 28px; font-size: 8px; width: auto; padding: 0 10px; margin-right: 4px; display: inline-block; }
+
+        #loginView { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 15px; overflow-y: auto; }
+        .login-box { width: 100%; max-width: 360px; background: var(--surface-2); padding: 30px 25px; border-radius: 14px; border: 1px solid var(--border); }
+        
+        #dashboardView { display: none; flex-direction: column; height: 100%; min-height: 0; }
+        .admin-meta { display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,.01); flex-shrink: 0; }
+        
+        .admin-layout { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+        .tabs { width: 150px; display: flex; flex-direction: column; gap: 4px; padding: 12px 8px; border-right: 1px solid var(--border); background: rgba(255,255,255,.01); flex-shrink: 0; }
+        .tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); text-align: left; padding: 10px; border-radius: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
+        .tab-btn.active { color: var(--shell-yellow); background: rgba(255,213,0,.08); border-color: rgba(255,213,0,.15); }
+        
+        .admin-content { flex: 1; padding: 16px; overflow-y: auto; min-height: 0; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .panel-card { background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 15px; }
+        
+        .table-wrapper { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: #0b0e12; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; text-align: left; }
+        th { background: #151a20; color: var(--text-muted); font-size: 8px; text-transform: uppercase; padding: 10px; border-bottom: 1px solid var(--border); }
+        td { padding: 10px; font-size: 10px; color: var(--text-soft); border-bottom: 1px solid rgba(255,255,255,.05); }
+        
+        .chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .chart-box { background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 10px; padding: 12px; position: relative; }
+        .canvas-wrapper { position: relative; width: 100%; height: 210px; }
+
+        @media (max-width: 768px) {
+            .admin-layout { flex-direction: column; }
+            .tabs { width: 100%; flex-direction: row; overflow-x: auto; padding: 8px; border-right: none; border-bottom: 1px solid var(--border); }
+            .tab-btn { flex: 0 0 auto; min-width: 85px; text-align: center; }
+            .admin-content { padding: 12px; }
+            .chart-container { grid-template-columns: 1fr; }
+            .canvas-wrapper { height: 180px; }
+        }
+
+        #customPopup {
+            position: fixed; right: 15px; bottom: 15px; max-width: 320px; background: #11151a; 
+            border: 1px solid var(--border-strong); border-left: 3px solid var(--shell-yellow); 
+            padding: 12px; border-radius: 6px; color: white; font-size: 11px; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+            transform: translateY(15px); opacity: 0; pointer-events: none; transition: .3s ease; z-index: 2000;
+        }
+        #customPopup.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+        #customPopup.error { border-left-color: var(--shell-red); }
+        .popup-buttons { margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end; }
+    </style>
+    <script>
+        function fijarAltoVisible() {
+            document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+        }
+        fijarAltoVisible();
+        window.addEventListener('resize', fijarAltoVisible);
+        window.addEventListener('orientationchange', fijarAltoVisible);
+
+        document.addEventListener('touchmove', function (e) {
+            if (!e.target.closest('.modal-overlay')) e.preventDefault();
+        }, { passive: false });
+    </script>
+</head>
+<body>
+
+    <!-- CABECERA -->
+    <header class="corporate-header">
+        <div class="brand-container">
+            <div class="goal-zero-logo">GOAL <span class="zero-mark">0</span></div>
+            <div class="logic-team-tag">LOGIC TEAM</div>
+            <div class="brand-subtitle">Safety Performance System</div>
+        </div>
+        <div class="header-actions">
+            <div class="system-status">
+                <span id="syncDot" class="sync-dot loading"></span>
+                <span id="syncText">Conectando...</span>
+            </div>
+            <button class="admin-trigger" onclick="openAdminModal()">Administración</button>
+        </div>
+    </header>
+
+    <!-- INDICADORES DINÁMICOS -->
+    <main class="performance-grid">
+        <section class="instrument-box">
+            <div class="inst-category">Indicador Operacional // Movilidad</div>
+            <div class="metric-display">
+                <div class="metric-ring" id="ringVial"></div>
+                <!-- Icono vectorial externo de seguridad vial -->
+                <img src="icono-vial.svg" alt="Icono Vial" class="metric-watermark">
+                <div class="metric-number" id="diasVial">--</div>
+            </div>
+            <div class="metric-label">Días sin Accidentes Viales</div>
+            <div class="time-counter">Tiempo transcurrido: <span id="detalleVial">--h --m --s</span></div>
+        </section>
+
+        <section class="instrument-box">
+            <div class="inst-category">Indicador Operacional // Contención</div>
+            <div class="metric-display">
+                <div class="metric-ring" id="ringDerrame"></div>
+                <!-- Icono vectorial externo de contención ambiental -->
+                <img src="icono-derrame.svg" alt="Icono Derrame" class="metric-watermark">
+                <div class="metric-number" id="diasDerrame">--</div>
+            </div>
+            <div class="metric-label">Días sin Derrames</div>
+            <div class="time-counter">Tiempo transcurrido: <span id="detalleDerrame">--h --m --s</span></div>
+        </section>
+    </main>
+
+    <!-- MODAL ADMINISTRADOR -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><span>GOAL ZERO</span> // Control Center</div>
+                <button class="close-modal" onclick="closeAdminModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="loginView">
+                    <div class="login-box">
+                        <div style="text-align:center; font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:700; margin-bottom: 20px;">Acceso al Sistema</div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Usuario</label>
+                            <input type="text" id="loginUser" class="form-control" placeholder="Usuario">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Contraseña</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="loginPass" class="form-control" placeholder="Contraseña">
+                                <button type="button" class="password-toggle" onclick="togglePassword('loginPass', this)">👁️</button>
+                            </div>
+                        </div>
+
+                        <button class="btn-action btn-yellow" onclick="fncLogin()" style="margin-top:10px;">Ingresar al sistema</button>
+                    </div>
+                </div>
+
+                <div id="dashboardView">
+                    <div class="admin-meta">
+                        <span style="font-size:11px;">Operador: <strong id="adminName" style="color:var(--shell-yellow);"></strong></span>
+                        <button class="btn-action btn-gray btn-small" onclick="fncLogout()">Cerrar sesión</button>
+                    </div>
+
+                    <div class="admin-layout">
+                        <div class="tabs">
+                            <button class="tab-btn active" onclick="switchTab('tabRegistro', this)">Registro</button>
+                            <button class="tab-btn" onclick="switchTab('tabEstadisticas', this)">Estadísticas</button>
+                            <button class="tab-btn" onclick="switchTab('tabHistorial', this)">Historial</button>
+                            <button class="tab-btn" onclick="switchTab('tabUsuarios', this)">Usuarios</button>
+                        </div>
+
+                        <div class="admin-content">
+                            <div id="tabRegistro" class="tab-content active">
+                                <div class="panel-card">
+                                    <h3 style="font-size:12px; text-transform:uppercase; margin-bottom:12px;">Clasificación del Evento</h3>
+                                    <div class="form-group">
+                                        <label class="form-label">Tipo de Incidente</label>
+                                        <select id="tipoIncidente" class="form-control">
+                                            <option value="Vial">Accidente Vial</option>
+                                            <option value="Derrame">Derrame de Crudo</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Observaciones</label>
+                                        <textarea id="incidenteObs" class="form-control" placeholder="Descripción del evento..." rows="2"></textarea>
+                                    </div>
+                                    <button class="btn-action btn-red" onclick="fncPreguntarRegistro()">⚠️ Registrar y Reiniciar a Cero</button>
+                                </div>
+                            </div>
+
+                            <div id="tabEstadisticas" class="tab-content">
+                                <div class="chart-container">
+                                    <div class="chart-box">
+                                        <h4 style="font-size:11px; margin-bottom:8px; color:var(--text-muted);">Proporción de Eventos</h4>
+                                        <div class="canvas-wrapper">
+                                            <canvas id="pieChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="chart-box">
+                                        <h4 style="font-size:11px; margin-bottom:8px; color:var(--text-muted);">Historial por Fechas</h4>
+                                        <div class="canvas-wrapper">
+                                            <canvas id="barChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="tabHistorial" class="tab-content">
+                                <div class="table-wrapper">
+                                    <table id="tablaHistorial">
+                                        <thead><tr><th>ID</th><th>Fecha</th><th>Tipo</th><th>Operador</th><th>Observación</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div id="tabUsuarios" class="tab-content">
+                                <div class="panel-card">
+                                    <h3 style="font-size:12px; text-transform:uppercase; margin-bottom:10px;">Crear Nuevo Usuario</h3>
+                                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <input type="text" id="nuevoUser" class="form-control" placeholder="Usuario">
+                                        </div>
+                                        <div class="form-group password-wrapper" style="margin-bottom:0;">
+                                            <input type="password" id="nuevoPass" class="form-control" placeholder="Contraseña">
+                                            <button type="button" class="toggle-password" onclick="togglePassword('nuevoPass', this)">👁️</button>
+                                        </div>
+                                    </div>
+                                    <button class="btn-action btn-yellow" onclick="fncCrearUsuario()" style="max-width:160px; margin-top:10px;">Crear Usuario</button>
+                                </div>
+                                
+                                <div class="table-wrapper">
+                                    <table id="tablaUsuarios">
+                                        <thead><tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Creado</th><th>Acciones</th></tr></thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP -->
+    <div id="customPopup" class="custom-popup">
+        <strong id="popupTitle" style="display:block; margin-bottom:5px; font-size:12px;">Atención</strong>
+        <div id="popupMessage" style="margin-bottom:10px;"></div>
+        <div id="popupCustomBody" style="margin-bottom:10px; display:none;"></div>
+        <div id="popupButtons" class="popup-buttons"></div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyKHWkvlk7q1S9IWWhh0m1saGAKeiOSAi5GeU-AIXzqqLPgzM7c62GzLB_p6gw9cdupyw/exec";
+
+        let fechaVial = null;
+        let fechaDerrame = null;
+        let currentUser = null;
+        let currentRol = null;
+        let chartPieInst = null;
+        let chartBarInst = null;
+
+        Chart.defaults.color = "#9aa1aa";
+        Chart.defaults.font.family = "Inter";
+
+        // ==========================================
+        // LÓGICA DE HITOS Y FESTEJOS
+        // ==========================================
+        const HITOS_INICIALES = [14, 30, 50, 100, 180, 365];
+
+        function esUnHito(dias) {
+            if (dias === '--' || dias <= 0) return false;
+            dias = parseInt(dias);
+            if (HITOS_INICIALES.includes(dias)) return true;
+            if (dias > 365 && dias % 100 === 0) return true;
+            return false;
+        }
+
+        function verificarHitosYFestejar(diasVial, diasDerrame) {
+            evaluarIndicador('Vial', diasVial);
+            evaluarIndicador('Derrame', diasDerrame);
+        }
+
+        function evaluarIndicador(tipo, dias) {
+            if (!esUnHito(dias)) return;
+
+            const storageKey = `festejo_${tipo}_${dias}`;
+            if (localStorage.getItem(storageKey)) return;
+
+            localStorage.setItem(storageKey, "celebrado");
+            lanzarFestejo(tipo, dias);
+        }
+
+        // --- NUEVAS FUNCIONES DE EFECTOS ---
+        function dispararConfeti() {
+            const duration = 5 * 1000; // 5 segundos de lluvia
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 3000 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                const particleCount = 50 * (timeLeft / duration);
+                
+                // Dispara desde la izquierda y la derecha simultáneamente
+                confetti(Object.assign({}, defaults, { particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                }));
+                confetti(Object.assign({}, defaults, { particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                }));
+            }, 250);
+        }
+
+        function reproducirSonido() {
+            // Requiere que guardes un archivo "festejo.mp3" en la misma carpeta que este HTML
+            const audio = new Audio('festejo.mp3');
+            audio.volume = 0.7; // Volumen al 70%
+            audio.play().catch(e => console.log("Autoplay de audio bloqueado por el navegador"));
+        }
+        // -----------------------------------
+
+        function lanzarFestejo(tipo, dias) {
+            const esMovil = window.innerWidth <= 768;
+            
+            // 1. Activar los efectos visuales y sonoros
+            dispararConfeti();
+            reproducirSonido();
+            
+            // 2. Mostrar el modal
+            const titulo = `🎉 ¡LOGRO ALCANZADO! 🎉`;
+            const mensaje = `¡Felicidades! Cumplimos ${dias} días sin incidentes de tipo: ${tipo}.`;
+
+            if (esMovil) {
+                const botonesHtml = `<button class="btn-action btn-yellow btn-small" onclick="closeCustomPopup()">¡Genial, Aceptar!</button>`;
+                mostrarPopup(titulo, mensaje, false, botonesHtml);
+            } else {
+                const botonesHtml = `<span style="font-size:10px; color:var(--text-muted);">Esta pantalla se cerrará automáticamente...</span>`;
+                mostrarPopup(titulo, mensaje, false, botonesHtml);
+
+                setTimeout(() => {
+                    closeCustomPopup();
+                }, 12000); 
+            }
+        }
+        // ==========================================
+
+        window.onload = () => {
+            sincronizarConServidor();
+            setInterval(actualizarRelojesYAnimacion, 1000);
+            setInterval(sincronizarConServidor, 120000); 
+        };
+
+        function setSyncStatus(status) {
+            const dot = document.getElementById('syncDot');
+            const text = document.getElementById('syncText');
+            dot.className = 'sync-dot'; 
+            if (status === 'loading') { dot.classList.add('loading'); text.innerText = 'Sincronizando...'; }
+            else if (status === 'success') { dot.classList.add('success'); text.innerText = 'Sistema sincronizado'; }
+            else if (status === 'error') { dot.classList.add('error'); text.innerText = 'Sin conexión'; }
+        }
+
+        function sincronizarConServidor() {
+            setSyncStatus('loading');
+            fetch(API_URL).then(res => res.json()).then(data => {
+                if (data.fecha_vial) fechaVial = new Date(data.fecha_vial);
+                if (data.fecha_derrame) fechaDerrame = new Date(data.fecha_derrame);
+                
+                actualizarRelojesYAnimacion();
+                setSyncStatus('success');
+
+                // --- INTEGRACIÓN DE FESTEJOS AQUÍ ---
+                if (fechaVial || fechaDerrame) {
+                    const diasV = fechaVial ? obtenerDesgloseTiempo(fechaVial).dias : '--';
+                    const diasD = fechaDerrame ? obtenerDesgloseTiempo(fechaDerrame).dias : '--';
+                    verificarHitosYFestejar(diasV, diasD);
+                }
+                // ------------------------------------
+
+            }).catch(e => setSyncStatus('error'));
+        }
+
+        function obtenerDesgloseTiempo(fechaBase) {
+            if (!fechaBase) return { dias: '--', texto: '--h --m --s' };
+            const diff = Math.max(0, new Date() - fechaBase);
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const minutos = Math.floor((diff / 1000 / 60) % 60);
+            const segundos = Math.floor((diff / 1000) % 60);
+            return {
+                dias: dias,
+                texto: `${horas.toString().padStart(2,"0")}h ${minutos.toString().padStart(2,"0")}m ${segundos.toString().padStart(2,"0")}s`
+            };
+        }
+
+        function actualizarRelojesYAnimacion() {
+            const now = new Date();
+            const segundosActuales = now.getSeconds() + (now.getMilliseconds() / 1000);
+            const gradosSegundos = (segundosActuales / 60) * 360;
+            
+            const diaDelMes = now.getDate();
+            const totalDiasMes = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const gradosMes = (diaDelMes / totalDiasMes) * 360;
+
+            const ringVial = document.getElementById('ringVial');
+            const ringDerrame = document.getElementById('ringDerrame');
+            
+            if(ringVial && ringDerrame) {
+                const styleVal = `--second-rotation: ${gradosSegundos}deg; --month-progress: ${gradosMes}deg;`;
+                ringVial.style.cssText = styleVal;
+                ringDerrame.style.cssText = styleVal;
+            }
+
+            if(fechaVial) {
+                const detVial = obtenerDesgloseTiempo(fechaVial);
+                document.getElementById('diasVial').innerText = detVial.dias;
+                document.getElementById('detalleVial').innerText = detVial.texto;
+            }
+            if(fechaDerrame) {
+                const detDerrame = obtenerDesgloseTiempo(fechaDerrame);
+                document.getElementById('diasDerrame').innerText = detDerrame.dias;
+                document.getElementById('detalleDerrame').innerText = detDerrame.texto;
+            }
+        }
+
+        function mostrarPopup(titulo, mensaje, esError = false, botonesHtml = null, customHtml = null) {
+            const popup = document.getElementById('customPopup');
+            document.getElementById('popupTitle').innerText = titulo;
+            document.getElementById('popupTitle').style.color = esError ? 'var(--shell-red)' : 'var(--shell-yellow)';
+            
+            popup.classList.toggle('error', esError);
+            
+            const msgEl = document.getElementById('popupMessage');
+            if (mensaje) { msgEl.innerText = mensaje; msgEl.style.display = 'block'; } 
+            else { msgEl.style.display = 'none'; }
+            
+            const customBody = document.getElementById('popupCustomBody');
+            if (customHtml) { customBody.innerHTML = customHtml; customBody.style.display = 'block'; } 
+            else { customBody.style.display = 'none'; }
+
+            const btnContainer = document.getElementById('popupButtons');
+            if (botonesHtml) { btnContainer.innerHTML = botonesHtml; } 
+            else { btnContainer.innerHTML = `<button class="btn-action btn-gray btn-small" onclick="closeCustomPopup()">Aceptar</button>`; }
+            
+            popup.classList.add('show');
+        }
+
+        function closeCustomPopup() {
+            document.getElementById('customPopup').classList.remove('show');
+        }
+
+        function togglePassword(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            if (input.type === "password") { input.type = "text"; btn.innerText = "🙈"; } 
+            else { input.type = "password"; btn.innerText = "👁️"; }
+        }
+
+        function openAdminModal() { document.getElementById('adminModal').classList.add('show'); }
+        function closeAdminModal() { document.getElementById('adminModal').classList.remove('show'); }
+
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btnElement.classList.add('active');
+            if(currentUser) {
+                cargarDatosDashboard();
+            }
+        }
+
+        function fncLogin() {
+            const usuario = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value;
+            if(!usuario || !password) {
+                mostrarPopup("Campos incompletos", "Por favor complete usuario y contraseña.", true);
+                return;
+            }
+
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", usuario, password }) })
+            .then(res => res.json()).then(data => {
+                if (data.success) {
+                    currentUser = data.usuario;
+                    currentRol = data.rol;
+                    document.getElementById('adminName').innerText = `${currentUser} (${currentRol})`;
+                    document.getElementById('loginView').style.display = 'none';
+                    document.getElementById('dashboardView').style.display = 'flex';
+                    cargarDatosDashboard();
+                } else { 
+                    mostrarPopup("Acceso denegado", data.message, true); 
+                }
+            }).catch(() => mostrarPopup("Error", "No se pudo conectar con el servidor.", true));
+        }
+
+        function fncLogout() {
+            currentUser = null;
+            currentRol = null;
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginView').style.display = 'flex';
+            document.getElementById('dashboardView').style.display = 'none';
+            closeAdminModal();
+        }
+
+        function fncPreguntarRegistro() {
+            const tipo = document.getElementById('tipoIncidente').value;
+            const mensaje = `¿Está seguro de registrar un incidente de tipo ${tipo}? El contador volverá a CERO.`;
+            const botones = `
+                <button class="btn-action btn-gray btn-small" onclick="closeCustomPopup()">Cancelar</button>
+                <button class="btn-action btn-red btn-small" onclick="ejecutarRegistro()">Confirmar</button>
+            `;
+            mostrarPopup("Confirmar Evento", mensaje, true, botones);
+        }
+
+        function ejecutarRegistro() {
+            closeCustomPopup();
+            const tipo = document.getElementById('tipoIncidente').value;
+            const observacion = document.getElementById('incidenteObs').value;
+            
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "registrar_incidente", usuario: currentUser, tipo, observacion }) })
+            .then(res => res.json()).then(data => {
+                if (data.success) {
+                    if (data.tipo_actualizado === "Vial") fechaVial = new Date(data.nueva_fecha);
+                    if (data.tipo_actualizado === "Derrame") fechaDerrame = new Date(data.nueva_fecha);
+                    document.getElementById('incidenteObs').value = '';
+                    actualizarRelojesYAnimacion();
+                    mostrarPopup("Éxito", "Incidente registrado y contador reiniciado correctamente.", false);
+                    switchTab('tabHistorial', document.querySelectorAll('.tab-btn')[2]);
+                }
+            }).catch(() => mostrarPopup("Error", "Error al registrar el incidente.", true));
+        }
+
+        function fncCrearUsuario() {
+            const nuevoUsuario = document.getElementById('nuevoUser').value.trim();
+            const nuevaPassword = document.getElementById('nuevoPass').value;
+            if(!nuevoUsuario || !nuevaPassword) {
+                mostrarPopup("Incompleto", "Complete todos los campos.", true);
+                return;
+            }
+
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "crear_usuario", masterUser: currentUser, nuevoUsuario, nuevaPassword, rol: "admin" }) })
+            .then(res => res.json()).then(data => {
+                if(data.success) {
+                    document.getElementById('nuevoUser').value = '';
+                    document.getElementById('nuevoPass').value = '';
+                    cargarDatosDashboard();
+                    mostrarPopup("Creado", data.message, false);
+                } else {
+                    mostrarPopup("Error", data.message, true);
+                }
+            }).catch(() => mostrarPopup("Error", "Error de conexión.", true));
+        }
+
+        function preguntarEliminar(usuarioAEliminar) {
+            const mensaje = `¿Estás seguro de eliminar al usuario "${usuarioAEliminar}"?`;
+            const botones = `
+                <button class="btn-action btn-gray btn-small" onclick="closeCustomPopup()">Cancelar</button>
+                <button class="btn-action btn-red btn-small" onclick="ejecutarEliminar('${usuarioAEliminar}')">Eliminar</button>
+            `;
+            mostrarPopup("Eliminar Usuario", mensaje, true, botones);
+        }
+
+        function ejecutarEliminar(usuarioAEliminar) {
+            closeCustomPopup();
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "eliminar_usuario", usuarioEjecuta: currentUser, usuarioAEliminar }) })
+            .then(res => res.json()).then(data => {
+                if(data.success) {
+                    cargarDatosDashboard();
+                    mostrarPopup("Eliminado", data.message, false);
+                } else {
+                    mostrarPopup("Denegado", data.message, true);
+                }
+            }).catch(() => mostrarPopup("Error", "Error de conexión.", true));
+        }
+
+        function preguntarResetPassword(usuarioObjetivo) {
+            const promptHtml = `
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Nueva contraseña para <b>${usuarioObjetivo}</b>:</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="promptNewPass" class="form-control" placeholder="Nueva contraseña">
+                        <button type="button" class="toggle-password" onclick="togglePassword('promptNewPass', this)">👁️</button>
+                    </div>
+                </div>
+            `;
+            const botonesHtml = `
+                <button class="btn-action btn-gray btn-small" onclick="closeCustomPopup()">Cancelar</button>
+                <button class="btn-action btn-yellow btn-small" onclick="ejecutarResetPassword('${usuarioObjetivo}')">Actualizar</button>
+            `;
+            mostrarPopup("Restablecer Contraseña", "", false, botonesHtml, promptHtml);
+        }
+
+        function ejecutarResetPassword(usuarioObjetivo) {
+            const nuevaPassword = document.getElementById('promptNewPass').value;
+            if(!nuevaPassword) return;
+
+            closeCustomPopup();
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "resetear_password", usuarioEjecuta: currentUser, usuarioObjetivo, nuevaPassword }) })
+            .then(res => res.json()).then(data => {
+                if(data.success) { mostrarPopup("Actualizado", data.message, false); } 
+                else { mostrarPopup("Error", data.message, true); }
+            }).catch(() => mostrarPopup("Error", "Error de conexión.", true));
+        }
+
+        function cargarDatosDashboard() {
+            if(!currentUser) return;
+            fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "get_dashboard_data" }) })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    dibujarTablaHistorial(data.historial || []);
+                    dibujarTablaUsuarios(data.usuarios || []);
+                    dibujarGraficas(data.historial || []);
+                } else { mostrarPopup("Error", data.error || "No se pudieron obtener los datos.", true); }
+            })
+            .catch(err => mostrarPopup("Error", "Fallo al cargar el panel.", true));
+        }
+
+        function dibujarTablaHistorial(historial) {
+            const tbody = document.querySelector('#tablaHistorial tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            [...historial].reverse().forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(c => { const td = document.createElement('td'); td.innerText = c || '-'; tr.appendChild(td); });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function dibujarTablaUsuarios(usuarios) {
+            const tbody = document.querySelector('#tablaUsuarios tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const rolActual = (currentRol || "").trim().toLowerCase();
+            const esMaster = (rolActual === 'master');
+            const esAdmin1 = (rolActual === 'admin 1' || rolActual === 'admin_1');
+
+            usuarios.forEach(row => {
+                const tr = document.createElement('tr');
+                const [id, user, rol, creado] = row;
+                const rolClean = String(rol || "").trim().toLowerCase();
+                
+                tr.innerHTML = `<td>${id}</td><td>${user}</td><td>${rol}</td><td>${creado || '-'}</td><td></td>`;
+                const tdAcciones = tr.querySelector('td:last-child');
+                
+                if (esMaster || esAdmin1) {
+                    const btnPass = document.createElement('button');
+                    btnPass.innerText = "Clave";
+                    btnPass.className = "btn-action btn-gray btn-small";
+                    btnPass.onclick = () => preguntarResetPassword(user);
+                    tdAcciones.appendChild(btnPass);
+                }
+
+                const esPrincipal = (rolClean === 'master' || rolClean === 'admin 1' || rolClean === 'admin_1');
+                let puedeBorrar = false;
+                if (esMaster && user !== currentUser && rolClean !== 'master') puedeBorrar = true;
+                else if (esAdmin1 && rolClean === 'admin' && user !== currentUser) puedeBorrar = true;
+
+                if (puedeBorrar) {
+                    const btnDel = document.createElement('button');
+                    btnDel.innerText = "Borrar";
+                    btnDel.className = "btn-action btn-red btn-small";
+                    btnDel.onclick = () => preguntarEliminar(user);
+                    tdAcciones.appendChild(btnDel);
+                } else if (esPrincipal) {
+                    const spanProt = document.createElement('span');
+                    spanProt.innerText = "Protegido";
+                    spanProt.style.color = "var(--text-muted)";
+                    spanProt.style.fontSize = "8px";
+                    spanProt.style.marginLeft = "4px";
+                    tdAcciones.appendChild(spanProt);
+                }
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function dibujarGraficas(historial) {
+            let vialCount = 0; let derrameCount = 0; let timeline = {};
+            historial.forEach(row => {
+                let fecha = row[1].split(',')[0];
+                let tipo = row[2];
+                if(tipo === 'Vial') vialCount++;
+                if(tipo === 'Derrame') derrameCount++;
+                if(!timeline[fecha]) timeline[fecha] = 0;
+                timeline[fecha]++;
+            });
+
+            if(chartPieInst) chartPieInst.destroy();
+            if(chartBarInst) chartBarInst.destroy();
+
+            chartPieInst = new Chart(document.getElementById('pieChart').getContext('2d'), {
+                type: 'doughnut',
+                data: { labels: ['Viales', 'Derrames'], datasets: [{ data: [vialCount, derrameCount], backgroundColor: ['#FFD500', '#DD1D21'], borderColor: '#161b21', borderWidth:2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {color: '#a9afb7', boxWidth: 10} } } }
+            });
+
+            chartBarInst = new Chart(document.getElementById('barChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels: Object.keys(timeline), datasets: [{ label: 'Eventos por Día', data: Object.values(timeline), backgroundColor: '#FFD500', borderRadius: 3 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: {color: 'rgba(255,255,255,0.05)'}, ticks: {color: '#a9afb7', stepSize: 1} }, x: { grid: {display: false}, ticks: {color: '#a9afb7'} } } }
+            });
+        }
+    </script>
+</body>
+</html>
