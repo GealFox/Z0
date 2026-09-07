@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="512"
+    height="512"
+    viewBox="0 0 512 512"
+    fill="none">
+
+    <!-- =====================================================
+         GOAL ZERO | SAFETY SYSTEM
+         App Icon / 512x512 SVG
+         ===================================================== -->
+
+    <!-- Fondo -->
+    <rect
+        x="0"
+        y="0"
+        width="512"
+        height="512"
+        rx="96"
+        fill="#080A0D"/>
+
+    <!-- Halo tecnológico -->
+    <circle
+        cx="256"
+        cy="256"
+        r="205"
+        stroke="#FFD500"
+        stroke-width="2"
+        opacity="0.08"/>
+
+    <circle
+        cx="256"
+        cy="256"
+        r="178"
+        stroke="#FFFFFF"
+        stroke-width="1"
+        opacity="0.06"/>
+
+    <!-- Arco de progreso / indicador -->
+    <path
+        d="M256 65
+           A191 191 0 0 1 437 256"
+        stroke="#FFD500"
+        stroke-width="8"
+        stroke-linecap="round"/>
+
+    <!-- Segmento rojo: control de incidentes -->
+    <path
+        d="M437 256
+           A191 191 0 0 1 418 331"
+        stroke="#DD1D21"
+        stroke-width="8"
+        stroke-linecap="round"/>
+
+    <!-- Pequeño indicador amarillo -->
+    <circle
+        cx="256"
+        cy="65"
+        r="7"
+        fill="#FFD500"/>
+
+    <!-- =====================================================
+         ISOTIPO Z0
+         ===================================================== -->
+
+    <!-- Z -->
+    <path
+        d="M115 178
+           H245
+           L119 334
+           H249"
+        stroke="#F5F6F7"
+        stroke-width="38"
+        stroke-linecap="square"
+        stroke-linejoin="miter"/>
+
+    <!-- 0 principal -->
+    <ellipse
+        cx="348"
+        cy="256"
+        rx="66"
+        ry="94"
+        stroke="#FFD500"
+        stroke-width="38"/>
+
+    <!-- Corte tecnológico del 0 -->
+    <path
+        d="M348 256
+           L394 194"
+        stroke="#080A0D"
+        stroke-width="18"
+        stroke-linecap="round"/>
+
+    <!-- Punto de control -->
+    <circle
+        cx="348"
+        cy="256"
+        r="9"
+        fill="#FFD500"/>
+
+    <!-- =====================================================
+         LÍNEA INFERIOR / SAFETY CONTROL
+         ===================================================== -->
+
+    <rect
+        x="116"
+        y="372"
+        width="280"
+        height="4"
+        rx="2"
+        fill="#FFFFFF"
+        opacity="0.12"/>
+
+    <!-- Línea amarilla de objetivo -->
+    <rect
+        x="116"
+        y="372"
+        width="92"
+        height="4"
+        rx="2"
+        fill="#FFD500"/>
+
+    <!-- Marca roja de evento -->
+    <rect
+        x="384"
+        y="372"
+        width="12"
+        height="4"
+        rx="2"
+        fill="#DD1D21"/>
+
+    <!-- Texto -->
+    <text
+        x="256"
+        y="414"
+        text-anchor="middle"
+        fill="#707780"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="17"
+        font-weight="700"
+        letter-spacing="5">
+        SAFETY SYSTEM
+    </text>
+
+    <!-- Marco interior muy sutil -->
+    <rect
+        x="25"
+        y="25"
+        width="462"
+        height="462"
+        rx="78"
+        stroke="#FFFFFF"
+        stroke-width="1"
+        opacity="0.05"/>
+
+</svg>

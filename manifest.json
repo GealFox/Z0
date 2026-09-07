@@ -1,0 +1,15 @@
+{
+  "name": "Goal Zero | Safety System",
+  "short_name": "Goal Zero",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080a0d",
+  "theme_color": "#FFD500",
+  "icons": [
+    {
+      "src": "icono-goal-zero.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
